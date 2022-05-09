@@ -70,11 +70,29 @@ client.on("messageCreate", (message) => {
     } else message.reply("这位更是个...");
   }
 
+
+  /*
+  // Another check in command - will augment result
+  if (command === "checkin2") {
+    let arg = args[0];
+    let num = Number(arg);
+    if (Number.isInteger(num)) {
+      if (num > 0) {
+        // Here we save user's response to database
+        // and show a prompt
+        saveResultAdd(message.author.id, message.author.username, num, message);
+      } else if (num === 0) message.reply("今天没刷题，你不心痛吗？");
+      else message.reply("这位更是个...");
+    } else message.reply("这位更是个...");
+  }
+  */
+  
   if (command === "help") {
     message.reply(
       "!checkin count: 打卡今日做题数量，会覆盖今天的记录\n!leaders: 显示本周前三卷王"
     );
   }
+  
 
   // Clear daily record in case mistakenly input wrong number
   if (command === "clear") {
