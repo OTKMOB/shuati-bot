@@ -28,7 +28,7 @@ client.on("ready", () => {
 
   // Start scheduled tasks
   let weeklyRanking = new cron.CronJob("0 0 23 * * SUN", function () {
-    getWeeklyResult(function (leaders) {
+    getWeeklyReport(function (leaders) {
       let juanWang = "本周的卷王是：";
       let length = Math.min(3, leaders.length);
       for (let i = 0; i < length; i++) {
