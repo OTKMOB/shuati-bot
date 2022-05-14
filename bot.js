@@ -35,14 +35,17 @@ client.on("ready", () => {
         juanWang += `${leaders[i].username}(${leaders[i].num}) `;
       }
       client.channels.cache.get(process.env.CHANNEL_ID).send(juanWang);
+      log.info("Weekly report sent");
     });
   });
   weeklyRanking.start();
 
-  let dailyReminder = new cron.CronJob("0 0 15 * * *", function () {
+  // Because of timezone difference, this task starts at 8pm LA time.
+  let dailyReminder = new cron.CronJob("0 0 4 * * *", function () {
     client.channels.cache
       .get(process.env.CHANNEL_ID)
       .send("@everyone, 今天你刷题了吗?");
+    log.info("Daily reminder sent");
   });
   dailyReminder.start();
 });
@@ -60,7 +63,7 @@ client.on("messageCreate", (message) => {
     let num = Number(arg);
     if (Number.isInteger(num)) {
       if (num > 20) {
-        message.reply("别卷了别卷了(一天做多打卡20题)");
+        message.reply("别卷了别卷了(一天最多打卡20题)");
       } else if (num > 0) {
         // Here we save user's response to database
         // and show a prompt
@@ -156,7 +159,7 @@ function saveResultAdd(userId, username, numProbs, message) {
 // Save records to database (using logic of replacing)
 function saveResult(userId, username, numProbs, message) {
   message.reply(
-    `${message.author.username}, 打卡成功！你今天做了${numProbs}题，你太牛了!`
+    `${message.author.username}，打卡成功！你今天做了${numProbs}题，你太牛了!`
   );
   getPrevRecord(userId, function (num) {
     if (num === 0) {
@@ -182,6 +185,7 @@ function saveResult(userId, username, numProbs, message) {
       );
     }
   });
+  log.info(`result saved for ${userId}, number ${numProbs}`);
 }
 
 // Retrieve user's daily record
@@ -198,6 +202,7 @@ function getPrevRecord(userId, callback) {
       else callback(result[0].num_probs);
     }
   );
+  log.info(`record retrieved for ${userId}`);
 }
 
 function clearResult(userId) {
@@ -211,6 +216,7 @@ function clearResult(userId) {
       if (err) log.error(err);
     }
   );
+  log.info(`record cleared for ${userId}`);
 }
 
 function sendWeeklyReport(message) {
