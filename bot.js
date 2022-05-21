@@ -69,8 +69,8 @@ client.on("messageCreate", (message) => {
         // and show a prompt
         saveResult(message.author.id, message.author.username, num, message);
       } else if (num === 0) message.reply("今天没刷题，你不心痛吗？");
-      else message.reply("这位更是个...");
-    } else message.reply("这位更是个...");
+      else message.reply("同学，请停止你这种幼稚的行为！");
+    } else message.reply("同学，请停止你这种幼稚的行为！");
   }
 
 
@@ -240,7 +240,7 @@ function getWeeklyReport(callback) {
         SELECT user_id, SUM(num_probs) AS num
         FROM user_record
         WHERE DATE(CONVERT_TZ(timestamp, 'UTC', 'America/Los_Angeles'))
-        BETWEEN DATE_SUB(DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles')), INTERVAL(WEEKDAY(CURRENT_DATE)) DAY)
+        BETWEEN DATE_SUB(DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles')), INTERVAL WEEKDAY(CURRENT_DATE) - 1 DAY)
         AND DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles'))
         GROUP BY user_id
       ) user_prob
@@ -248,7 +248,7 @@ function getWeeklyReport(callback) {
         SELECT user_id, MAX(id) AS row_num
         FROM user_record
         WHERE DATE(CONVERT_TZ(timestamp, 'UTC', 'America/Los_Angeles'))
-        BETWEEN DATE_SUB(DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles')), INTERVAL(WEEKDAY(CURRENT_DATE)) DAY)
+        BETWEEN DATE_SUB(DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles')), INTERVAL WEEKDAY(CURRENT_DATE) - 1 DAY)
         AND DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles'))
         GROUP BY user_id
       ) record
