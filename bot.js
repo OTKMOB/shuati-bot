@@ -247,7 +247,7 @@ function getWeeklyReport(callback) {
         SELECT user_id, SUM(num_probs) AS num
         FROM user_record
         WHERE DATE(CONVERT_TZ(timestamp, 'UTC', 'America/Los_Angeles'))
-        BETWEEN DATE_SUB(DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles')), INTERVAL WEEKDAY(DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles'))) - 1 DAY)
+        BETWEEN DATE_SUB(DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles')), INTERVAL WEEKDAY(DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles'))) DAY)
         AND DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles'))
         GROUP BY user_id
       ) user_prob
@@ -255,7 +255,7 @@ function getWeeklyReport(callback) {
         SELECT user_id, MAX(id) AS row_num
         FROM user_record
         WHERE DATE(CONVERT_TZ(timestamp, 'UTC', 'America/Los_Angeles'))
-        BETWEEN DATE_SUB(DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles')), INTERVAL WEEKDAY(DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles'))) - 1 DAY)
+        BETWEEN DATE_SUB(DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles')), INTERVAL WEEKDAY(DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles'))) DAY)
         AND DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles'))
         GROUP BY user_id
       ) record
