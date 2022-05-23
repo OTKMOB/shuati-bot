@@ -29,11 +29,7 @@ client.on("ready", () => {
   // Start scheduled tasks
   let weeklyRanking = new cron.CronJob("0 0 23 * * SUN", function () {
     getWeeklyReport(function (leaders) {
-      let juanWang = "本周的卷王是：";
-      let length = Math.min(3, leaders.length);
-      for (let i = 0; i < length; i++) {
-        juanWang += `${leaders[i].username}(${leaders[i].num}) `;
-      }
+      let juanWang = generateJuanwang(leaders);
       client.channels.cache.get(process.env.CHANNEL_ID).send(juanWang);
       log.info("Weekly report sent");
     });
@@ -68,9 +64,10 @@ client.on("messageCreate", (message) => {
         // Here we save user's response to database
         // and show a prompt
         saveResult(message.author.id, message.author.username, num, message);
-      } else if (num === 0) message.reply("今天没刷题，你不心痛吗？");
-      else message.reply("同学，请停止你这种幼稚的行为！");
-    } else message.reply("同学，请停止你这种幼稚的行为！");
+      } else if (num === 0)
+        message.reply("你怎么睡得着的？你这个年龄段，你这个阶段你睡得着觉？");
+      else message.reply("你在骂！");
+    } else message.reply("你在骂！");
   }
 
 
@@ -205,6 +202,7 @@ function getPrevRecord(userId, callback) {
   log.info(`record retrieved for ${userId}`);
 }
 
+// Clear the record for a user on the current date
 function clearResult(userId) {
   connection.query(
     `
@@ -219,17 +217,26 @@ function clearResult(userId) {
   log.info(`record cleared for ${userId}`);
 }
 
+// Generate a list of people ordered by the number of problems solved each week
 function sendWeeklyReport(message) {
   getWeeklyReport(function (leaders) {
-    let juanWang = "本周的卷王是：";
-    let length = Math.min(3, leaders.length);
-    for (let i = 0; i < length; i++) {
-      juanWang += `${leaders[i].username}(${leaders[i].num}) `;
-    }
+    let juanWang = generateJuanwang(leaders);
     message.reply(juanWang);
   });
 }
 
+// Generate the result for the above function
+function generateJuanwang(leaders) {
+  let juanWang = "本周的卷王是：";
+  // Here you can specify the number of people displayed manually
+  let length = Math.min(10, leaders.length);
+  for (let i = 0; i < length; i++) {
+    juanWang += `${leaders[i].username}(${leaders[i].num}) `;
+  }
+  return juanWang;
+}
+
+// Compute the weekly report
 function getWeeklyReport(callback) {
   connection.query(
     `
@@ -240,7 +247,7 @@ function getWeeklyReport(callback) {
         SELECT user_id, SUM(num_probs) AS num
         FROM user_record
         WHERE DATE(CONVERT_TZ(timestamp, 'UTC', 'America/Los_Angeles'))
-        BETWEEN DATE_SUB(DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles')), INTERVAL WEEKDAY(CURRENT_DATE) - 1 DAY)
+        BETWEEN DATE_SUB(DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles')), INTERVAL WEEKDAY(DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles'))) - 1 DAY)
         AND DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles'))
         GROUP BY user_id
       ) user_prob
@@ -248,7 +255,7 @@ function getWeeklyReport(callback) {
         SELECT user_id, MAX(id) AS row_num
         FROM user_record
         WHERE DATE(CONVERT_TZ(timestamp, 'UTC', 'America/Los_Angeles'))
-        BETWEEN DATE_SUB(DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles')), INTERVAL WEEKDAY(CURRENT_DATE) - 1 DAY)
+        BETWEEN DATE_SUB(DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles')), INTERVAL WEEKDAY(DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles'))) - 1 DAY)
         AND DATE(CONVERT_TZ(CURRENT_TIMESTAMP, 'UTC', 'America/Los_Angeles'))
         GROUP BY user_id
       ) record
